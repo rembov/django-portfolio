@@ -1,0 +1,6 @@
+[
+  { "model": "main.achievement", "pk": 1, "fields": { "code": "game", "name": "Игрок", "description": "Победа в игре «Найди слово»" } },
+  { "model": "main.achievement", "pk": 2, "fields": { "code": "grammar_am", "name": "Знаток to be", "description": "Верный ответ в тесте am/is/are" } },
+  { "model": "main.achievement", "pk": 3, "fields": { "code": "grammar_this", "name": "Указательный профи", "description": "Верный ответ в тесте this/that/these/those" } },
+  { "model": "main.achievement", "pk": 4, "fields": { "code": "speaking", "name": "Говорун", "description": "Правильное произношение" } }
+]

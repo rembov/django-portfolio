@@ -1,0 +1,96 @@
+{% extends 'main/base.html' %}
+{% block content %}
+<h2 class="text-4xl font-bold mb-6 text-purple-800"><i class="fas fa-microphone-alt"></i> Произношение</h2>
+
+<div class="bg-white p-8 rounded-3xl shadow-xl text-center">
+    <p class="text-2xl mb-4">Скажи слово:</p>
+    <div id="currentWordDisplay" class="text-6xl font-bold text-purple-600 mb-6">Cat</div>
+    <div class="flex justify-center space-x-4">
+        <button id="startListen" class="bg-red-500 text-white px-8 py-4 rounded-full text-2xl shadow-lg hover:bg-red-600">
+            <i class="fas fa-microphone"></i> Говори
+        </button>
+        <button id="stopListen" class="bg-gray-500 text-white px-8 py-4 rounded-full text-2xl shadow-lg hover:bg-gray-600" disabled>
+            <i class="fas fa-stop"></i> Стоп
+        </button>
+    </div>
+    <div id="speakResult" class="mt-6 text-xl"></div>
+    <div id="speakMessage" class="mt-4 text-lg"></div>
+</div>
+
+<script>
+    const wordsList = ['cat', 'dog', 'book', 'car', 'house', 'apple', 'bird', 'sun', 'fish', 'tree', 'moon', 'star', 'happy', 'sad', 'big', 'small', 'red', 'blue', 'green', 'yellow'];
+    let currentWord = 'cat';
+    let recognition = null;
+    let isListening = false;
+
+    function pickNewWord() {
+        currentWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+        document.getElementById('currentWordDisplay').innerText = currentWord;
+    }
+
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Ваш браузер не поддерживает распознавание речи. Используйте Chrome или Edge.');
+    } else {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        recognition.continuous = false;
+
+        recognition.onstart = function() {
+            isListening = true;
+            document.getElementById('startListen').disabled = true;
+            document.getElementById('stopListen').disabled = false;
+            document.getElementById('speakResult').innerHTML = 'Слушаю...';
+        };
+
+        recognition.onend = function() {
+            isListening = false;
+            document.getElementById('startListen').disabled = false;
+            document.getElementById('stopListen').disabled = true;
+            if (document.getElementById('speakResult').innerHTML === 'Слушаю...') {
+                document.getElementById('speakResult').innerHTML = 'Не расслышал, попробуйте ещё раз.';
+            }
+        };
+
+        recognition.onresult = (event) => {
+            const speechResult = event.results[0][0].transcript.toLowerCase().trim().replace(/[.,!?]/g, '');
+            document.getElementById('speakResult').innerHTML = `Вы сказали: "${speechResult}"`;
+
+            if (speechResult === currentWord) {
+                document.getElementById('speakMessage').innerHTML = '<span class="text-green-600 text-2xl">🎉 Отлично! Правильно!</span>';
+                reportResult('speaking', true);
+                pickNewWord();
+            } else {
+                document.getElementById('speakMessage').innerHTML = '<span class="text-red-600 text-2xl">❌ Попробуй ещё раз</span>';
+            }
+        };
+
+        recognition.onerror = (event) => {
+            document.getElementById('speakResult').innerHTML = 'Ошибка: ' + event.error;
+            isListening = false;
+            document.getElementById('startListen').disabled = false;
+            document.getElementById('stopListen').disabled = true;
+        };
+
+        document.getElementById('startListen').onclick = () => {
+            if (!isListening) {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    // Если уже запущен, игнорируем
+                }
+            }
+        };
+
+        document.getElementById('stopListen').onclick = () => {
+            if (isListening) {
+                recognition.stop();
+            }
+        };
+    }
+
+    window.onload = pickNewWord;
+</script>
+{% endblock %}

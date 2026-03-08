@@ -1,0 +1,85 @@
+{% extends 'main/base.html' %}
+{% block content %}
+<h2 class="text-4xl font-bold mb-6 text-purple-800"><i class="fas fa-book-open"></i> Изучаем слова</h2>
+
+<div class="flex space-x-4 mb-6 flex-wrap">
+    <button onclick="loadCategory('alphabet')" class="bg-white px-4 py-2 rounded-full shadow m-1">Алфавит</button>
+    <button onclick="loadCategory('professions')" class="bg-white px-4 py-2 rounded-full shadow m-1">Профессии</button>
+    <button onclick="loadCategory('animals')" class="bg-white px-4 py-2 rounded-full shadow m-1">Животные</button>
+    <button onclick="loadCategory('colors')" class="bg-white px-4 py-2 rounded-full shadow m-1">Цвета</button>
+</div>
+
+<div id="wordCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <!-- Карточки будут загружены через JS -->
+</div>
+
+<script>
+    const wordsData = JSON.parse('{{ words_json|safe }}');
+
+    function speak(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+    }
+
+    function getEmoji(category, word) {
+        // Возвращаем эмодзи в зависимости от категории и слова
+        const lowerWord = word.toLowerCase();
+        if (category === 'alphabet') {
+            // Для букв используем символы или эмодзи с буквами
+            const letter = word.toUpperCase();
+            return `<span class="text-6xl">${letter}</span>`;
+        } else if (category === 'animals') {
+            const emojiMap = {
+                'cat': '🐱', 'dog': '🐶', 'elephant': '🐘', 'lion': '🦁', 'tiger': '🐯',
+                'monkey': '🐵', 'bird': '🐦', 'fish': '🐟', 'cow': '🐮', 'horse': '🐴'
+            };
+            return `<span class="text-6xl">${emojiMap[lowerWord] || '🐾'}</span>`;
+        } else if (category === 'professions') {
+            const emojiMap = {
+                'doctor': '👨‍⚕️', 'teacher': '👩‍🏫', 'engineer': '👷', 'pilot': '👨‍✈️',
+                'chef': '👨‍🍳', 'artist': '🎨', 'musician': '🎵', 'police': '👮',
+                'firefighter': '👨‍🚒', 'scientist': '🔬'
+            };
+            return `<span class="text-6xl">${emojiMap[lowerWord] || '💼'}</span>`;
+        } else if (category === 'colors') {
+            const emojiMap = {
+                'red': '🔴', 'blue': '🔵', 'green': '🟢', 'yellow': '🟡',
+                'orange': '🟠', 'purple': '🟣', 'pink': '🌸', 'brown': '🟤',
+                'black': '⚫', 'white': '⚪'
+            };
+            return `<span class="text-6xl">${emojiMap[lowerWord] || '🎨'}</span>`;
+        }
+        return `<span class="text-6xl">📦</span>`;
+    }
+
+    function loadCategory(cat) {
+        const container = document.getElementById('wordCards');
+        const filtered = wordsData.filter(w => w.category === cat);
+        container.innerHTML = '';
+        if (filtered.length === 0) {
+            container.innerHTML = '<p class="text-center text-xl col-span-full text-gray-500">Нет слов в этой категории. Добавьте их через <a href="/admin" class="text-purple-600 underline">админку</a>.</p>';
+            return;
+        }
+        filtered.forEach(w => {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-4 rounded-2xl shadow-lg text-center bubble cursor-pointer';
+            card.onclick = () => speak(w.word);
+            card.innerHTML = `
+                <div class="flex justify-center mb-2">${getEmoji(w.category, w.word)}</div>
+                <p class="text-xl font-bold">${w.word}</p>
+                <p class="text-gray-600">${w.translation}</p>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    window.onload = () => {
+        if (wordsData.length > 0) {
+            loadCategory('animals');
+        } else {
+            document.getElementById('wordCards').innerHTML = '<p class="text-center text-xl col-span-full text-gray-500">База слов пуста. Зайдите в админку и добавьте слова.</p>';
+        }
+    };
+</script>
+{% endblock %}

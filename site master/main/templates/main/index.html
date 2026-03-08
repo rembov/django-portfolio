@@ -1,0 +1,54 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Главная - Мастер на час{% endblock %}
+
+{% block content %}
+    <div class="jumbotron" style="text-align: center; margin-bottom: 4rem;">
+        <h1>⚡РЕМОНТ БУДУЩЕГО⚡</h1>
+        <p style="font-size: 1.4rem; color: #ccc; max-width: 700px; margin: 1rem auto;">
+            Профессиональный ремонт и обслуживание с гарантией.
+            Неоновая скорость, лазерная точность.
+        </p>
+        <a href="{% url 'services' %}" class="btn" style="font-size: 1.3rem; padding: 1rem 3rem;">🚀 Заказать услугу</a>
+    </div>
+
+    <h2>🔥 Популярные услуги</h2>
+    <div class="card-grid">
+        {% for service in services %}
+            <div class="card">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img" alt="{{ service.name }}">
+                {% else %}
+                    <div class="card-img" style="background: linear-gradient(45deg, #1a2a3a, #2a3a4a); display: flex; align-items: center; justify-content: center; color: cyan;">📷 Нет фото</div>
+                {% endif %}
+                <h3 class="card-title">{{ service.name }}</h3>
+                <p class="card-text">{{ service.description|truncatewords:20 }}</p>
+                <span class="card-price">{{ service.price }} ₽</span>
+                <a href="{% url 'contacts' %}" class="btn btn-outline" style="width: 100%; text-align: center;">Заказать</a>
+            </div>
+        {% empty %}
+            <p style="color: cyan;">Скоро появятся услуги...</p>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 4rem; text-align: center;">
+        <h2>💬 Почему мы?</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
+            <div style="flex: 1 1 200px; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 2rem; border: 1px solid magenta;">
+                <div style="font-size: 3rem;">⚡</div>
+                <h3>Скорость</h3>
+                <p>Выезд за 30 минут</p>
+            </div>
+            <div style="flex: 1 1 200px; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 2rem; border: 1px solid cyan;">
+                <div style="font-size: 3rem;">🔧</div>
+                <h3>Опыт</h3>
+                <p>Более 10 лет</p>
+            </div>
+            <div style="flex: 1 1 200px; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 2rem; border: 1px solid yellow;">
+                <div style="font-size: 3rem;">💎</div>
+                <h3>Гарантия</h3>
+                <p>До 2 лет</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

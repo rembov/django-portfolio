@@ -1,0 +1,70 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<h1 class="text-center mb-5" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+    Каталог книг, фильмов и игр
+</h1>
+
+<!-- Фильтры -->
+<div class="row mb-4 justify-content-center">
+    <div class="col-md-10">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">Все категории</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="year" class="form-select">
+                    <option value="">Все года</option>
+                    {% for y in years %}
+                        <option value="{{ y }}" {% if selected_year|stringformat:"s" == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-warning-custom w-100">Применить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Карточки -->
+<div class="row g-4">
+    {% for item in items %}
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100">
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">📷 Нет фото</div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text">{{ item.description|truncatechars:80 }}</p>
+                    <p><strong>Год:</strong> {{ item.year }}</p>
+                    <p><strong>Рейтинг:</strong> 
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= item.average_rating|floatformat:0 %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                        ({{ item.average_rating|floatformat:1 }})
+                    </p>
+                    <a href="{% url 'item_detail' item.id %}" class="btn btn-warning-custom w-100">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center">Ничего не найдено.</p>
+    {% endfor %}
+</div>
+{% endblock %}

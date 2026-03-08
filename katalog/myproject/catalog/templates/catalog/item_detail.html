@@ -1,0 +1,71 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        {% if item.image %}
+            <img src="{{ item.image.url }}" class="img-fluid rounded-4" alt="{{ item.title }}">
+        {% else %}
+            <div class="bg-secondary rounded-4 d-flex align-items-center justify-content-center" style="height: 300px;">📷 Нет фото</div>
+        {% endif %}
+    </div>
+    <div class="col-md-8">
+        <h1>{{ item.title }}</h1>
+        <p><strong>Категория:</strong> {{ item.category.name }}</p>
+        <p><strong>Год:</strong> {{ item.year }}</p>
+        <p><strong>Средний рейтинг:</strong> 
+            {% for i in "12345" %}
+                {% if forloop.counter <= item.average_rating|floatformat:0 %}★{% else %}☆{% endif %}
+            {% endfor %}
+            ({{ item.average_rating|floatformat:1 }})
+        </p>
+        <p>{{ item.description }}</p>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- Отзывы -->
+<h2>Отзывы ({{ reviews.count }})</h2>
+<div class="row">
+    <div class="col-md-7">
+        {% for review in reviews %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ review.user.username }}</h5>
+                    <p>Оценка: 
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </p>
+                    <p>{{ review.comment|default:"Без комментария" }}</p>
+                    <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                </div>
+            </div>
+        {% empty %}
+            <p>Пока нет отзывов. Будьте первым!</p>
+        {% endfor %}
+    </div>
+
+    <div class="col-md-5">
+        {% if user.is_authenticated %}
+            {% if user_review %}
+                <div class="alert alert-info">Вы уже оставили отзыв ({{ user_review.rating }} ★)</div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Ваш отзыв</h4>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-warning-custom">Отправить</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <p><a href="{% url 'login' %}?next={{ request.path }}">Войдите</a>, чтобы оставить отзыв.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

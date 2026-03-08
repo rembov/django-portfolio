@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Неоновый блог{% endblock %}</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0f1f;
+            color: #e0e0ff;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        /* Анимированный неоновый фон */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(0, 255, 255, 0.15) 0%, transparent 30%),
+                        radial-gradient(circle at 70% 60%, rgba(255, 0, 255, 0.15) 0%, transparent 35%),
+                        radial-gradient(circle at 20% 80%, rgba(255, 200, 0, 0.1) 0%, transparent 40%);
+            z-index: -2;
+            animation: neonPulse 8s infinite alternate;
+        }
+        @keyframes neonPulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        /* Плавающие частицы */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: cyan;
+            box-shadow: 0 0 15px cyan, 0 0 30px magenta;
+            border-radius: 50%;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: -1;
+            animation: float 12s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-100vh) translateX(20vw); }
+        }
+
+        /* Навбар с неоном */
+        .navbar {
+            background: rgba(10, 20, 30, 0.5);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #00ffff40;
+            box-shadow: 0 0 30px #00ffff40;
+            padding: 0.8rem 0;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px #00ffff;
+            letter-spacing: 1px;
+        }
+        .nav-link {
+            color: #fff;
+            font-weight: 500;
+            margin: 0 1rem;
+            position: relative;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            color: #00ffff;
+            text-shadow: 0 0 10px cyan;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, cyan, magenta);
+            transition: width 0.2s ease;
+            box-shadow: 0 0 10px cyan;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Карточки с неоном */
+        .card {
+            border: none;
+            border-radius: 28px;
+            background: rgba(20, 30, 50, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            transition: 0.3s;
+            overflow: hidden;
+            text-align: center;  /* центрируем текст внутри карточек */
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: magenta;
+            box-shadow: 0 0 40px magenta, 0 0 60px cyan;
+            background: rgba(30, 40, 60, 0.6);
+        }
+        .card-img-top {
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 1px solid cyan;
+        }
+        .card-title a {
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, cyan, magenta);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+        .card-title a:hover {
+            text-shadow: 0 0 15px magenta;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, cyan, magenta);
+            border: none;
+            border-radius: 50px;
+            padding: 0.5rem 1.8rem;
+            font-weight: 600;
+            color: #0a0f1f;
+            box-shadow: 0 0 20px cyan;
+            transition: 0.2s;
+            display: inline-block;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, magenta, cyan);
+            box-shadow: 0 0 30px magenta;
+            color: #0a0f1f;
+        }
+
+        /* Пагинация */
+        .pagination .page-link {
+            border: 1px solid cyan;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            margin: 0 4px;
+            border-radius: 40px;
+            color: cyan;
+            font-weight: 500;
+            box-shadow: 0 0 10px cyan;
+        }
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, cyan, magenta);
+            color: #0a0f1f;
+            border-color: magenta;
+        }
+
+        /* Комментарии */
+        .comment-card {
+            background: rgba(20,30,50,0.3);
+            backdrop-filter: blur(6px);
+            border: 1px solid magenta;
+            border-radius: 24px;
+            transition: 0.2s;
+            text-align: center;  /* центрируем текст комментариев */
+        }
+        .comment-card:hover {
+            border-color: cyan;
+            box-shadow: 0 0 25px cyan;
+        }
+
+        /* Формы */
+        .form-control, .form-select {
+            border-radius: 40px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid cyan;
+            color: #fff;
+            padding: 0.75rem 1.2rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: magenta;
+            box-shadow: 0 0 20px magenta;
+            background: rgba(0,0,0,0.6);
+        }
+
+        /* Футер */
+        .footer {
+            background: rgba(10, 20, 30, 0.5);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid cyan;
+            padding: 1.5rem 0;
+            text-align: center;
+            color: #aaccff;
+            margin-top: 3rem;
+        }
+
+        .post-meta {
+            color: #aaddff;
+        }
+        .post-content {
+            color: #e0e0ff;
+            font-size: 1.1rem;
+            text-align: center;  /* центрируем текст поста */
+        }
+        h1, h2, h3 {
+            background: linear-gradient(135deg, cyan, magenta);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        /* Центрирование заголовков */
+        h1, h2 {
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Неоновые частицы -->
+    <div class="particle" style="top: 10%; left: 5%; animation-duration: 14s;"></div>
+    <div class="particle" style="top: 30%; left: 80%; animation-duration: 18s;"></div>
+    <div class="particle" style="top: 70%; left: 20%; animation-duration: 12s;"></div>
+    <div class="particle" style="top: 50%; left: 40%; animation-duration: 20s;"></div>
+    <div class="particle" style="top: 85%; left: 70%; animation-duration: 16s;"></div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <i class="bi bi-pen-fill" style="color:cyan;"></i> Блог
+            </a>
+            <div class="d-flex">
+                <a class="nav-link" href="{% url 'index' %}">Главная</a>
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'admin:index' %}">Админка</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; {% now "Y" %} Неоновый блог. Сияем ярко ✨</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Каталогиум{% endblock %}</title>
+    <!-- Bootstrap 5 + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0f1f;
+            color: #ffffff;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        /* Неоновый фон */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.15) 0%, transparent 30%),
+                        radial-gradient(circle at 70% 60%, rgba(245, 158, 11, 0.15) 0%, transparent 35%),
+                        radial-gradient(circle at 20% 80%, rgba(255, 200, 100, 0.1) 0%, transparent 40%);
+            z-index: -2;
+            animation: neonPulse 8s infinite alternate;
+        }
+        @keyframes neonPulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        /* Плавающие частицы */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #fbbf24;
+            box-shadow: 0 0 15px #fbbf24, 0 0 30px #f59e0b;
+            border-radius: 50%;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: -1;
+            animation: float 12s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-100vh) translateX(20vw); }
+        }
+
+        /* Навбар */
+        .navbar {
+            background: rgba(10, 20, 30, 0.5);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #fbbf2440;
+            box-shadow: 0 0 30px #fbbf2440;
+            padding: 0.8rem 0;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px #fbbf24;
+            letter-spacing: 1px;
+        }
+        .nav-link {
+            color: #ffffff;
+            font-weight: 500;
+            margin: 0 0.8rem;
+            position: relative;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            color: #fbbf24;
+            text-shadow: 0 0 10px #fbbf24;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            transition: width 0.2s ease;
+            box-shadow: 0 0 10px #fbbf24;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Карточки товаров */
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid #fbbf2440;
+            border-radius: 20px;
+            transition: 0.3s;
+            color: #ffffff;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 0 30px #fbbf24;
+            background: rgba(40, 51, 69, 0.9);
+        }
+        .card-img-top {
+            height: 220px;
+            object-fit: cover;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            border-bottom: 1px solid #fbbf2440;
+        }
+        .card-body {
+            padding: 1.5rem;
+            flex: 1;
+        }
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        .card-title a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .card-title a:hover {
+            color: #fbbf24;
+            text-shadow: 0 0 8px #fbbf24;
+        }
+        .card-text {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1rem;
+        }
+        .card .price,
+        .card .rating {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        .btn-warning-custom {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            border: none;
+            color: #0a0f1f;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 8px 24px;
+            box-shadow: 0 0 20px #fbbf24;
+            transition: 0.2s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-warning-custom:hover {
+            background: linear-gradient(45deg, #f59e0b, #fbbf24);
+            color: #0a0f1f;
+            box-shadow: 0 0 30px #fbbf24;
+        }
+
+        /* Формы */
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #fbbf24;
+            color: #ffffff;
+            border-radius: 30px;
+            padding: 10px 20px;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(0,0,0,0.7);
+            border-color: #f59e0b;
+            box-shadow: 0 0 15px #fbbf24;
+            color: #ffffff;
+        }
+        label {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        /* Пагинация */
+        .pagination .page-link {
+            border: 1px solid #fbbf24;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            margin: 0 4px;
+            border-radius: 40px;
+            color: #ffffff;
+            font-weight: 500;
+            box-shadow: 0 0 10px #fbbf24;
+        }
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            color: #0a0f1f;
+            border-color: #f59e0b;
+        }
+
+        /* Футер */
+        .footer {
+            background: rgba(10, 20, 30, 0.5);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid #fbbf24;
+            padding: 1.5rem 0;
+            text-align: center;
+            color: #ffffff;
+            margin-top: 3rem;
+        }
+
+        /* Заголовки */
+        h1, h2, h3 {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Частицы -->
+    <div class="particle" style="top: 10%; left: 5%; animation-duration: 14s;"></div>
+    <div class="particle" style="top: 30%; left: 80%; animation-duration: 18s;"></div>
+    <div class="particle" style="top: 70%; left: 20%; animation-duration: 12s;"></div>
+    <div class="particle" style="top: 50%; left: 40%; animation-duration: 20s;"></div>
+    <div class="particle" style="top: 85%; left: 70%; animation-duration: 16s;"></div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <i class="bi bi-collection-fill" style="color: #fbbf24;"></i> Каталогиум
+            </a>
+            <div class="d-flex">
+                <a class="nav-link" href="{% url 'index' %}">Главная</a>
+                {% if user.is_authenticated %}
+                    <span class="nav-link">Привет, {{ user.username }}</span>
+                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; padding: 0; font: inherit; color: inherit;">Выйти</button>
+                    </form>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">Войти</a>
+                    <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+                {% endif %}
+                {% if user.is_authenticated and user.is_staff %}
+                    <a class="nav-link" href="{% url 'admin:index' %}">Админка</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; {% now "Y" %} Каталогиум. Все звёзды сияют для вас ✨</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

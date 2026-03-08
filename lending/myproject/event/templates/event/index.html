@@ -1,0 +1,141 @@
+{% extends 'event/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero с обратным отсчётом -->
+<section class="container d-flex flex-column align-items-center justify-content-center text-center py-5" style="min-height: 70vh;">
+    <h1 class="display-2 fw-bold" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        {{ settings.title }}
+    </h1>
+    <p class="lead mt-4 col-md-8 text-muted-custom">{{ settings.description|truncatechars:200 }}</p>
+    <div class="mt-5">
+        <h3 style="background: none; color: #1e293b; font-weight: 600;">До начала события осталось:</h3>
+        <div class="countdown" id="countdown" data-start="{{ settings.date_start.isoformat }}"></div>
+    </div>
+    <a href="#register" class="btn btn-primary-custom btn-lg mt-4">Зарегистрироваться</a>
+</section>
+
+<!-- О событии -->
+<section class="container py-5">
+    <h2 class="section-title">О событии</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <p class="text-muted-custom">{{ settings.description }}</p>
+            <p><i class="bi bi-calendar3" style="color: #3b82f6;"></i> <strong>{{ settings.date_start|date:"j E Y, H:i" }}</strong></p>
+            <p><i class="bi bi-geo-alt" style="color: #8b5cf6;"></i> {{ settings.venue }}</p>
+            <p><i class="bi bi-telephone" style="color: #3b82f6;"></i> {{ settings.organizer_contact }}</p>
+            {% if settings.logo %}
+                <img src="{{ settings.logo.url }}" alt="logo" class="img-fluid rounded-4 mt-3" style="max-width: 300px; border: 2px solid #3b82f6;">
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Спикеры -->
+<section class="container py-5">
+    <h2 class="section-title">Спикеры</h2>
+    <div class="row g-4 justify-content-center">
+        {% for speaker in speakers %}
+        <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+            <div class="card w-100 p-3 text-center">
+                {% if speaker.photo %}
+                    <img src="{{ speaker.photo.url }}" class="card-img-top rounded-circle mx-auto" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #3b82f6;" alt="{{ speaker.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h4 class="card-title">{{ speaker.name }}</h4>
+                    <p class="text-primary" style="color: #3b82f6 !important; font-weight: 600;">{{ speaker.title }}</p>
+                    <p class="card-text">{{ speaker.bio|truncatechars:100 }}</p>
+                    {% if speaker.social_link %}
+                        <a href="{{ speaker.social_link }}" target="_blank" class="btn btn-outline-primary btn-sm" style="border-color: #3b82f6; color: #3b82f6;">LinkedIn</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">Спикеры уточняются.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Программа -->
+<section class="container py-5">
+    <h2 class="section-title">Программа</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% for item in schedule %}
+            <div class="card mb-3 p-3">
+                <div class="row g-0 align-items-center">
+                    <div class="col-md-2 text-center mb-2 mb-md-0">
+                        <span class="badge p-3" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white;">{{ item.start_time|date:"H:i" }}–{{ item.end_time|date:"H:i" }}</span>
+                    </div>
+                    <div class="col-md-7">
+                        <h5 style="color: #1e293b;">{{ item.title }}</h5>
+                        <p class="text-muted-custom">{{ item.description }}</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        {% if item.speaker %}
+                            <strong style="color: #8b5cf6;">{{ item.speaker.name }}</strong>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">Программа публикуется.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Форма регистрации -->
+<section id="register" class="container py-5">
+    <h2 class="section-title">Регистрация</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="glass-form">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-semibold">Имя</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label fw-semibold">Телефон</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom w-100">Отправить заявку</button>
+                </form>
+                <p class="text-muted mt-3 text-center">Мы свяжемся с вами для подтверждения участия.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Скрипт счётчика (без изменений) -->
+{% block extra_js %}
+<script>
+    function updateCountdown() {
+        const el = document.getElementById('countdown');
+        if (!el) return;
+        const start = new Date(el.dataset.start);
+        const now = new Date();
+        const diff = start - now;
+        if (diff <= 0) {
+            el.innerHTML = "Событие уже началось!";
+            return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+        el.innerHTML = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+    }
+    setInterval(updateCountdown, 1000);
+    window.addEventListener('load', updateCountdown);
+</script>
+{% endblock %}
+{% endblock %}

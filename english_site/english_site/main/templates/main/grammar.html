@@ -1,0 +1,117 @@
+{% extends 'main/base.html' %}
+{% block content %}
+<h2 class="text-4xl font-bold mb-6 text-purple-800"><i class="fas fa-cubes"></i> Грамматика</h2>
+
+<div class="flex space-x-4 mb-6">
+    <button onclick="showSection('amIsAre')" class="bg-white px-6 py-3 rounded-full shadow">am/is/are</button>
+    <button onclick="showSection('thisThat')" class="bg-white px-6 py-3 rounded-full shadow">this/that/these/those</button>
+</div>
+
+<div id="grammarContent">
+    <!-- Динамическая подгрузка -->
+</div>
+
+<script>
+    function showSection(section) {
+        const container = document.getElementById('grammarContent');
+        if(section === 'amIsAre') {
+            container.innerHTML = `
+                <div class="bg-white p-8 rounded-3xl shadow-xl">
+                    <h3 class="text-3xl font-bold mb-4">Глагол to be (am/is/are)</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center mb-6">
+                        <div class="bg-blue-100 p-4 rounded-2xl">I <span class="font-bold text-2xl">am</span></div>
+                        <div class="bg-green-100 p-4 rounded-2xl">He/She/It <span class="font-bold text-2xl">is</span></div>
+                        <div class="bg-yellow-100 p-4 rounded-2xl">You/We/They <span class="font-bold text-2xl">are</span></div>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xl">Выбери правильную форму:</p>
+                        <div class="mt-4" id="questionArea"></div>
+                        <div class="flex space-x-4 mt-4">
+                            <button onclick="checkGrammar('am')" class="bg-blue-500 text-white px-6 py-2 rounded-full">am</button>
+                            <button onclick="checkGrammar('is')" class="bg-green-500 text-white px-6 py-2 rounded-full">is</button>
+                            <button onclick="checkGrammar('are')" class="bg-yellow-500 text-white px-6 py-2 rounded-full">are</button>
+                        </div>
+                        <div id="grammarResult" class="mt-4 text-xl"></div>
+                    </div>
+                </div>
+            `;
+            generateQuestion();
+        } else {
+            container.innerHTML = `
+                <div class="bg-white p-8 rounded-3xl shadow-xl">
+                    <h3 class="text-3xl font-bold mb-4">Указательные местоимения</h3>
+                    <div class="grid grid-cols-2 gap-6 text-center mb-6">
+                        <div class="bg-indigo-100 p-4 rounded-2xl"><span class="font-bold text-2xl">This</span> (этот, близко)</div>
+                        <div class="bg-indigo-100 p-4 rounded-2xl"><span class="font-bold text-2xl">That</span> (тот, далеко)</div>
+                        <div class="bg-indigo-100 p-4 rounded-2xl"><span class="font-bold text-2xl">These</span> (эти)</div>
+                        <div class="bg-indigo-100 p-4 rounded-2xl"><span class="font-bold text-2xl">Those</span> (те)</div>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xl">Выбери правильное слово:</p>
+                        <div class="mt-4" id="questionArea2"></div>
+                        <div class="flex space-x-4 mt-4 flex-wrap">
+                            <button onclick="checkThisThat('this')" class="bg-purple-500 text-white px-6 py-2 rounded-full m-1">this</button>
+                            <button onclick="checkThisThat('that')" class="bg-purple-500 text-white px-6 py-2 rounded-full m-1">that</button>
+                            <button onclick="checkThisThat('these')" class="bg-purple-500 text-white px-6 py-2 rounded-full m-1">these</button>
+                            <button onclick="checkThisThat('those')" class="bg-purple-500 text-white px-6 py-2 rounded-full m-1">those</button>
+                        </div>
+                        <div id="thisThatResult" class="mt-4 text-xl"></div>
+                    </div>
+                </div>
+            `;
+            generateThisThatQuestion();
+        }
+    }
+
+    function generateQuestion() {
+        const questions = [
+            {text: 'I ___ 15 years old.', answer: 'am'},
+            {text: 'She ___ a doctor.', answer: 'is'},
+            {text: 'They ___ from London.', answer: 'are'},
+            {text: 'We ___ students.', answer: 'are'},
+            {text: 'He ___ my brother.', answer: 'is'},
+        ];
+        const q = questions[Math.floor(Math.random() * questions.length)];
+        window.currentGrammarQuestion = q;
+        document.getElementById('questionArea').innerHTML = `<p class="text-2xl">${q.text}</p>`;
+    }
+
+    function checkGrammar(ans) {
+        if(ans === window.currentGrammarQuestion.answer) {
+            document.getElementById('grammarResult').innerHTML = '<span class="text-green-600">✅ Верно! Молодец!</span>';
+            // Подсветка правильной кнопки (можно добавить класс)
+            event.target.classList.add('correct');
+            setTimeout(() => event.target.classList.remove('correct'), 500);
+            reportResult('grammar_am', true);
+        } else {
+            document.getElementById('grammarResult').innerHTML = '<span class="text-red-600">❌ Неверно. Попробуй ещё.</span>';
+        }
+    }
+
+    function generateThisThatQuestion() {
+        const questions = [
+            {text: '_____ people are in Australia now (далеко).', answer: 'those'},
+            {text: 'Look at _____ picture here (рядом).', answer: 'this'},
+            {text: '_____ apples on the tree over there.', answer: 'those'},
+            {text: 'I like _____ flowers in my hand.', answer: 'these'},
+            {text: '_____ is my house (рядом).', answer: 'this'},
+        ];
+        const q = questions[Math.floor(Math.random() * questions.length)];
+        window.currentThisThatQuestion = q;
+        document.getElementById('questionArea2').innerHTML = `<p class="text-2xl">${q.text}</p>`;
+    }
+
+    function checkThisThat(ans) {
+        if(ans === window.currentThisThatQuestion.answer) {
+            document.getElementById('thisThatResult').innerHTML = '<span class="text-green-600">✅ Правильно!</span>';
+            event.target.classList.add('correct');
+            setTimeout(() => event.target.classList.remove('correct'), 500);
+            reportResult('grammar_this', true);
+        } else {
+            document.getElementById('thisThatResult').innerHTML = '<span class="text-red-600">❌ Неправильно.</span>';
+        }
+    }
+
+    window.onload = () => showSection('amIsAre');
+</script>
+{% endblock %}

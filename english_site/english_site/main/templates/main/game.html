@@ -1,0 +1,108 @@
+{% extends 'main/base.html' %}
+{% block content %}
+<h2 class="text-4xl font-bold mb-6 text-purple-800"><i class="fas fa-gamepad"></i> Найди слово!</h2>
+
+<div id="gameArea" class="bg-white p-6 rounded-3xl shadow-xl">
+    <div class="text-center mb-6">
+        <span class="text-2xl">Найди: </span>
+        <span id="targetWord" class="text-4xl font-bold text-purple-600"></span>
+        <button onclick="speakCurrent()" class="ml-4 bg-purple-200 p-2 rounded-full"><i class="fas fa-volume-up"></i></button>
+    </div>
+    <div id="gameCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <!-- карточки -->
+    </div>
+    <div id="message" class="text-center mt-6 text-xl"></div>
+</div>
+
+<script>
+    const words = JSON.parse('{{ words_json|safe }}');
+    if (words.length === 0) {
+        document.getElementById('gameArea').innerHTML = '<p class="text-center text-xl text-gray-500">Сначала добавьте слова в <a href="/admin" class="text-purple-600 underline">админке</a>.</p>';
+    } else {
+        let currentWord = null;
+        let currentOptions = [];
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            speechSynthesis.speak(utterance);
+        }
+
+        function speakCurrent() {
+            if(currentWord) speak(currentWord.word);
+        }
+
+        function getEmoji(category, word) {
+            const lowerWord = word.toLowerCase();
+            if (category === 'alphabet') {
+                return `<span class="text-5xl">${word.toUpperCase()}</span>`;
+            } else if (category === 'animals') {
+                const emojiMap = {
+                    'cat': '🐱', 'dog': '🐶', 'elephant': '🐘', 'lion': '🦁', 'tiger': '🐯',
+                    'monkey': '🐵', 'bird': '🐦', 'fish': '🐟', 'cow': '🐮', 'horse': '🐴'
+                };
+                return `<span class="text-5xl">${emojiMap[lowerWord] || '🐾'}</span>`;
+            } else if (category === 'professions') {
+                const emojiMap = {
+                    'doctor': '👨‍⚕️', 'teacher': '👩‍🏫', 'engineer': '👷', 'pilot': '👨‍✈️',
+                    'chef': '👨‍🍳', 'artist': '🎨', 'musician': '🎵', 'police': '👮',
+                    'firefighter': '👨‍🚒', 'scientist': '🔬'
+                };
+                return `<span class="text-5xl">${emojiMap[lowerWord] || '💼'}</span>`;
+            } else if (category === 'colors') {
+                const emojiMap = {
+                    'red': '🔴', 'blue': '🔵', 'green': '🟢', 'yellow': '🟡',
+                    'orange': '🟠', 'purple': '🟣', 'pink': '🌸', 'brown': '🟤',
+                    'black': '⚫', 'white': '⚪'
+                };
+                return `<span class="text-5xl">${emojiMap[lowerWord] || '🎨'}</span>`;
+            }
+            return `<span class="text-5xl">📦</span>`;
+        }
+
+        function newRound() {
+            const targetIndex = Math.floor(Math.random() * words.length);
+            currentWord = words[targetIndex];
+
+            let others = words.filter((_, i) => i !== targetIndex);
+            others = shuffle(others).slice(0, 3);
+            currentOptions = shuffle([currentWord, ...others]);
+
+            document.getElementById('targetWord').innerText = currentWord.word;
+
+            const container = document.getElementById('gameCards');
+            container.innerHTML = '';
+            currentOptions.forEach(w => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-2xl shadow-lg text-center bubble cursor-pointer border-2 border-transparent hover:border-purple-400';
+                card.onclick = () => checkAnswer(w);
+                card.innerHTML = `
+                    <div class="flex justify-center mb-2">${getEmoji(w.category, w.word)}</div>
+                    <p class="text-xl font-bold">${w.word}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkAnswer(selected) {
+            if(selected.id === currentWord.id) {
+                document.getElementById('message').innerHTML = '<span class="text-green-600 text-2xl">✅ Правильно!</span>';
+                speak('Correct!');
+                reportResult('game', true);
+                setTimeout(newRound, 1500);
+            } else {
+                document.getElementById('message').innerHTML = '<span class="text-red-600 text-2xl">❌ Неправильно, попробуй ещё</span>';
+                speak('Try again');
+                event.target.closest('div').classList.add('incorrect');
+                setTimeout(() => event.target.closest('div').classList.remove('incorrect'), 300);
+            }
+        }
+
+        function shuffle(arr) {
+            return arr.sort(() => Math.random() - 0.5);
+        }
+
+        window.onload = newRound;
+    }
+</script>
+{% endblock %}

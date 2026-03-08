@@ -1,0 +1,51 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Контакты - Мастер на час{% endblock %}
+
+{% block content %}
+    <h1>📞 Связь с нами</h1>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;">
+        <div class="contact-info">
+            <h2 style="border-left-color: cyan;">📍 Контакты</h2>
+            <p><strong style="color: magenta;">📱 Телефон:</strong> <a href="tel:{{ settings.phone }}">{{ settings.phone }}</a></p>
+            <p><strong style="color: magenta;">✉️ Email:</strong> <a href="mailto:{{ settings.email }}">{{ settings.email }}</a></p>
+            {% if settings.address %}
+                <p><strong style="color: magenta;">🏠 Адрес:</strong> {{ settings.address }}</p>
+            {% endif %}
+            {% if settings.vk %}
+                <p><strong style="color: magenta;">🌐 VK:</strong> <a href="{{ settings.vk }}" target="_blank">{{ settings.vk }}</a></p>
+            {% endif %}
+            {% if settings.telegram %}
+                <p><strong style="color: magenta;">✈️ Telegram:</strong> <a href="{{ settings.telegram }}" target="_blank">{{ settings.telegram }}</a></p>
+            {% endif %}
+        </div>
+
+        <div class="glass-form">
+            <h2 style="margin-top: 0;">💬 Напишите нам</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="form-label">Ваше имя</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone" class="form-label">Телефон</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="message" class="form-label">Сообщение</label>
+                    <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">🚀 Отправить</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        @media (max-width: 768px) {
+            div[style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+{% endblock %}

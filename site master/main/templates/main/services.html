@@ -1,0 +1,24 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Услуги - Мастер на час{% endblock %}
+
+{% block content %}
+    <h1>📋 Наши услуги</h1>
+    <div class="card-grid">
+        {% for service in services %}
+            <div class="card">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img" alt="{{ service.name }}">
+                {% else %}
+                    <div class="card-img" style="background: linear-gradient(45deg, #1a2a3a, #2a3a4a); display: flex; align-items: center; justify-content: center; color: magenta;">📷 Скоро</div>
+                {% endif %}
+                <h3 class="card-title">{{ service.name }}</h3>
+                <p class="card-text">{{ service.description }}</p>
+                <span class="card-price">{{ service.price }} ₽</span>
+                <a href="{% url 'contacts' %}" class="btn btn-outline" style="width: 100%; text-align: center;">Заказать</a>
+            </div>
+        {% empty %}
+            <p style="color: cyan; grid-column: 1/-1; text-align: center;">Список услуг пополняется...</p>
+        {% endfor %}
+    </div>
+{% endblock %}
